@@ -12,6 +12,7 @@ local default_opts = {
 	display = true,
 	insert = false,
 	replace = false,
+	append = false,
 	show_prompt = false,
 	window = "float",
 }
@@ -43,7 +44,7 @@ function factory.create_action(opts)
 
 			-- stuff for replace
 			local sel_pos
-			if opts.replace then
+			if opts.replace or opts.append then
 				bufnr = vim.fn.bufnr("%") or 0
 				sel_pos = require("ollama.util").get_selection_pos()
 				if sel_pos == nil then
@@ -127,7 +128,7 @@ function factory.create_action(opts)
 						vim.api.nvim_set_option_value("modifiable", false, { buf = out_buf })
 					end
 
-					if opts.insert or opts.replace then
+					if opts.insert or opts.replace or opts.append then
 						local text = table.concat(lines, "\n")
 						if prompt.extract then
 							text = text:match(prompt.extract)
@@ -145,6 +146,9 @@ function factory.create_action(opts)
 							vim.api.nvim_buf_set_text(bufnr, start_line, start_col, end_line, end_col, lines)
 						elseif opts.insert then
 							vim.api.nvim_buf_set_lines(bufnr, cursorLine, cursorLine, false, lines)
+						elseif opts.append then
+							local start_line, start_col, end_line, end_col = unpack(sel_pos)
+							vim.api.nvim_buf_set_lines(bufnr, end_line+1, end_line+1, false, lines)
 						end
 
 						-- close floating window when done insert/replacing

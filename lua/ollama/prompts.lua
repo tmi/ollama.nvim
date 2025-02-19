@@ -35,6 +35,11 @@ local prompts = {
 		prompt = "Generate $ftype code that does the following: $input\n\n" .. response_format,
 		action = "insert",
 	},
+
+	Tests = {
+		prompt = "Generate $ftype tests for this code:\n```$ftype\n$sel```. Respond EXACTLY in this format:\n```$ftype\n<your code>\n```",
+		action = "append",
+	},
 }
 
 return prompts
